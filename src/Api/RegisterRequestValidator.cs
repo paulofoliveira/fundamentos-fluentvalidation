@@ -65,6 +65,13 @@ namespace Api
             //        x.Add(new USPhoneNumberDtoValidator());
             //        x.Add(new InternationalPhoneNumberDtoValidator());
             //    });
+
+            // Aplicando RuleSet
+
+            RuleSet("Email", () =>
+            {
+                RuleFor(x => x.Email).NotEmpty().Length(0, 150).EmailAddress();
+            });
         }
     }
     public class AddressDtoValidator : AbstractValidator<AddressDto>

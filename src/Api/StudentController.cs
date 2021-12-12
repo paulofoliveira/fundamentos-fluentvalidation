@@ -23,6 +23,7 @@ namespace Api
             var validator = new RegisterRequestValidator();
 
             var result = validator.Validate(request);
+            //var result = validator.Validate(request, options=> options.IncludeRuleSets("Email").IncludeRulesNotInRuleSet()); // Usando RuleSets
 
             if (!result.IsValid)
                 return BadRequest(result.Errors[0].ErrorMessage);
