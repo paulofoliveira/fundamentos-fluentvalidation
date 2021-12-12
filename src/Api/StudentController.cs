@@ -20,6 +20,13 @@ namespace Api
         [HttpPost]
         public IActionResult Register([FromBody] RegisterRequest request)
         {
+            var validator = new RegisterRequestValidator();
+
+            var result = validator.Validate(request);
+
+            if (!result.IsValid)
+                return BadRequest(result.Errors[0].ErrorMessage);
+
             var student = new Student(request.Email, request.Name, request.Address);
             _studentRepository.Save(student);
 
