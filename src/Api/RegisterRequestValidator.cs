@@ -26,11 +26,16 @@ namespace Api
     {
         public RegisterRequestValidator()
         {
+            // CascadeMode = CascadeMode.Stop; Ativar CascadeMode à nível de Validator
+
             // NotEmpty Rule considera valor nulo e vazio.
             // Regra aplicada no EmailAdress é a simplificada por padrão (.NET 5) por questão de ser impossível validar o e-mail com todas as possibilidades.
 
-            RuleFor(x => x.Name).NotEmpty().Length(0, 200);
-            RuleFor(x => x.Email).NotEmpty().Length(0, 150).EmailAddress();
+            RuleFor(x => x.Name)
+                //.Cascade(CascadeMode.Stop) // Ativar CascadeMode à nível de propriedade
+                .NotEmpty()
+                .Length(0, 200);
+
 
             // .When(x=> x.Address != null) checa se Address não é nula. Se condição é verdadeira pois no input poderia passar Address como null.
 
@@ -68,10 +73,36 @@ namespace Api
 
             // Aplicando RuleSet
 
-            RuleSet("Email", () =>
-            {
-                RuleFor(x => x.Email).NotEmpty().Length(0, 150).EmailAddress();
-            });
+            //RuleSet("Email", () =>
+            //{
+            //    RuleFor(x => x.Email).NotEmpty().Length(0, 150).EmailAddress();
+            //});
+
+            // Aplicando condições de validação
+
+            //RuleFor(x => x.Phone).NotEmpty()
+            //    .Must(x => Regex.IsMatch(x, "^[2-9][0-9]{9}$"))
+            //    .When(x => x.Phone != null, ApplyConditionTo.CurrentValidator)
+            //    .WithMessage("The phone number is incorrect");
+
+            //When(x => x.Email != null, () =>
+            // {
+            //     RuleFor(x => x.Email).NotEmpty().Length(0, 150).EmailAddress();
+            //     RuleFor(x => x.Phone).Null();
+            // })
+            //.Otherwise(() =>
+            //{
+            //    RuleFor(x => x.Phone).NotEmpty().Matches("^[2-9][0-9]{9}$");
+            //    RuleFor(x => x.Email).Null();
+            //});
+
+            // When( ... é aplicado a todas as checagens. ApplyConditionTo.CurrentValidator deve ser passado como argumento para a Rule em questão
+
+            When(x => x.Phone == null, () => { RuleFor(x => x.Email).NotEmpty(); });
+            When(x => x.Email == null, () => { RuleFor(x => x.Phone).NotEmpty(); });
+
+            RuleFor(x => x.Email).NotEmpty().Length(0, 150).EmailAddress().When(x => x.Email != null);
+            RuleFor(x => x.Phone).NotEmpty().Matches("^[2-9][0-9]{9}$").When(x => x.Phone != null);
         }
     }
     public class AddressDtoValidator : AbstractValidator<AddressDto>
@@ -89,8 +120,9 @@ namespace Api
         public AddressesCollectionDtoValidator()
         {
             RuleFor(x => x)
-             .Must(x => x?.Length >= 1 && x.Length <= 3)
-             .WithMessage("The number of address must be between and 3")
+             //.Must(x => x?.Length >= 1 && x.Length <= 3)
+             //.WithMessage("The number of address must be between and 3")
+             .ListMustContainNumberOfItems(1, 3)
              .ForEach(address =>
              {
                  address.NotNull();

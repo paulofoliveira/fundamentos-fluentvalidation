@@ -6,6 +6,7 @@
         public string Email { get; set; }
         public AddressDto[] Addresses { get; set; }
         //public PhoneNumberDto Phone { get; set; }
+        public string Phone { get; set; }
     }
     public class RegisterResponse
     {
