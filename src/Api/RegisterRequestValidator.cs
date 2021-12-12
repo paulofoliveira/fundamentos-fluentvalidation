@@ -19,7 +19,7 @@ namespace Api
             //        address.SetValidator(new AddressDtoValidator());
             //    });
 
-            RuleFor(x => x.Addresses).NotNull().SetValidator(new AddressesCollectionValidator());
+            RuleFor(x => x.Addresses).NotNull().SetValidator(new AddressesCollectionDtoValidator());
         }
     }
     public class RegisterRequestValidator : AbstractValidator<RegisterRequest>
@@ -55,7 +55,7 @@ namespace Api
             //    address.SetValidator(new AddressDtoValidator());
             //});
 
-            RuleFor(x => x.Addresses).NotNull().SetValidator(new AddressesCollectionValidator());
+            RuleFor(x => x.Addresses).NotNull().SetValidator(new AddressesCollectionDtoValidator());
         }
     }
     public class AddressDtoValidator : AbstractValidator<AddressDto>
@@ -68,9 +68,9 @@ namespace Api
             RuleFor(x => x.ZipCode).NotEmpty().Length(0, 5);
         }
     }
-    public class AddressesCollectionValidator : AbstractValidator<AddressDto[]>
+    public class AddressesCollectionDtoValidator : AbstractValidator<AddressDto[]>
     {
-        public AddressesCollectionValidator()
+        public AddressesCollectionDtoValidator()
         {
             RuleFor(x => x)
              .Must(x => x?.Length >= 1 && x.Length <= 3)
