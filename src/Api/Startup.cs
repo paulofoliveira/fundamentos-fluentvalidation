@@ -11,6 +11,9 @@ namespace Api
 
             services.AddTransient<StudentRepository>();
             services.AddTransient<CourseRepository>();
+
+            // ValidatorOptions.Global.CascadeMode = CascadeMode.Stop; Ativar CascadeMode a nível de aplicação.
+            // CascadeMode controla o flow de validação. Pode ser aplicado a nível global (como acima), a nível de Validator ou propriedade.
         }
 
         public void Configure(IApplicationBuilder app)

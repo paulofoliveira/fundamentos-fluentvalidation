@@ -26,10 +26,15 @@ namespace Api
     {
         public RegisterRequestValidator()
         {
+            // CascadeMode = CascadeMode.Stop; Ativar CascadeMode à nível de Validator
+
             // NotEmpty Rule considera valor nulo e vazio.
             // Regra aplicada no EmailAdress é a simplificada por padrão (.NET 5) por questão de ser impossível validar o e-mail com todas as possibilidades.
 
-            RuleFor(x => x.Name).NotEmpty().Length(0, 200);
+            RuleFor(x => x.Name)
+                //.Cascade(CascadeMode.Stop) // Ativar CascadeMode à nível de propriedade
+                .NotEmpty()
+                .Length(0, 200);
 
 
             // .When(x=> x.Address != null) checa se Address não é nula. Se condição é verdadeira pois no input poderia passar Address como null.
