@@ -120,8 +120,9 @@ namespace Api
         public AddressesCollectionDtoValidator()
         {
             RuleFor(x => x)
-             .Must(x => x?.Length >= 1 && x.Length <= 3)
-             .WithMessage("The number of address must be between and 3")
+             //.Must(x => x?.Length >= 1 && x.Length <= 3)
+             //.WithMessage("The number of address must be between and 3")
+             .ListMustContainNumberOfItems(1, 3)
              .ForEach(address =>
              {
                  address.NotNull();
