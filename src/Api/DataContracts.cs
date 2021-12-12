@@ -1,12 +1,10 @@
-﻿using DomainModel;
-
-namespace Api
+﻿namespace Api
 {
     public class RegisterRequest
     {
         public string Name { get; set; }
         public string Email { get; set; }
-        public string Address { get; set; }
+        public AddressDto Address { get; set; }
     }
     public class RegisterResponse
     {
@@ -15,7 +13,7 @@ namespace Api
     public class EditPersonalInfoRequest
     {
         public string Name { get; set; }
-        public string Address { get; set; }
+        public AddressDto Address { get; set; }
     }
     public class EnrollRequest
     {
@@ -30,7 +28,14 @@ namespace Api
     {
         public string Name { get; set; }
         public string Email { get; set; }
-        public string Address { get; set; }
+        public AddressDto Address { get; set; }
         public CourseEnrollmentDto[] Enrollments { get; set; }
+    }
+    public class AddressDto
+    {
+        public string Street { get; set; }
+        public string City { get; set; }
+        public string State { get; set; }
+        public string ZipCode { get; set; }
     }
 }

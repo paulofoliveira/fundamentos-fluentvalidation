@@ -2,6 +2,15 @@
 
 namespace Api
 {
+    public class EditPersonalInfoRequestValidator : AbstractValidator<EditPersonalInfoRequest>
+    {
+        public EditPersonalInfoRequestValidator()
+        {
+            RuleFor(x => x.Name).NotEmpty().Length(0, 200);
+            RuleFor(x => x.Address).NotNull().SetValidator(new AddressDtoValidator());
+        }
+    }
+
     public class RegisterRequestValidator : AbstractValidator<RegisterRequest>
     {
         public RegisterRequestValidator()
@@ -11,7 +20,31 @@ namespace Api
 
             RuleFor(x => x.Name).NotEmpty().Length(0, 200);
             RuleFor(x => x.Email).NotEmpty().Length(0, 150).EmailAddress();
-            RuleFor(x => x.Address).NotEmpty().Length(0, 150);
+
+            // .When(x=> x.Address != null) checa se Address não é nula. Se condição é verdadeira pois no input poderia passar Address como null.
+
+            // Inline validation rules
+
+            //RuleFor(x => x.Address).NotNull();
+            //RuleFor(x => x.Address.Street).NotEmpty().Length(0, 150).When(x => x.Address != null);
+            //RuleFor(x => x.Address.City).NotEmpty().Length(0, 40).When(x => x.Address != null);
+            //RuleFor(x => x.Address.State).NotEmpty().Length(0, 2).When(x => x.Address != null);
+            //RuleFor(x => x.Address.ZipCode).NotEmpty().Length(0, 5).When(x => x.Address != null);
+
+            // Para evitar duplicação de código o ideal é criar um Validator separado para AddressDto (Abaixo) tendo um código mais limpo, evitando duplicação e verbosidade.
+
+            RuleFor(x => x.Address).NotNull().SetValidator(new AddressDtoValidator());
+        }
+    }
+
+    public class AddressDtoValidator : AbstractValidator<AddressDto>
+    {
+        public AddressDtoValidator()
+        {
+            RuleFor(x => x.Street).NotEmpty().Length(0, 150);
+            RuleFor(x => x.City).NotEmpty().Length(0, 40);
+            RuleFor(x => x.State).NotEmpty().Length(0, 2);
+            RuleFor(x => x.ZipCode).NotEmpty().Length(0, 5);
         }
     }
 }

@@ -1,7 +1,7 @@
-﻿using System;
-using System.Linq;
-using DomainModel;
+﻿using DomainModel;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Linq;
 
 namespace Api
 {
@@ -27,7 +27,9 @@ namespace Api
             if (!result.IsValid)
                 return BadRequest(result.Errors[0].ErrorMessage);
 
-            var student = new Student(request.Email, request.Name, request.Address);
+            var address = new Address(request.Address.Street, request.Address.City, request.Address.State, request.Address.ZipCode);
+            var student = new Student(request.Email, request.Name, address);
+
             _studentRepository.Save(student);
 
             var response = new RegisterResponse
@@ -40,9 +42,18 @@ namespace Api
         [HttpPut("{id}")]
         public IActionResult EditPersonalInfo(long id, [FromBody] EditPersonalInfoRequest request)
         {
-            Student student = _studentRepository.GetById(id);
+            var validator = new EditPersonalInfoRequestValidator();
 
-            student.EditPersonalInfo(request.Name, request.Address);
+            var result = validator.Validate(request);
+
+            if (!result.IsValid)
+                return BadRequest(result.Errors[0].ErrorMessage);
+
+            var student = _studentRepository.GetById(id);
+
+            var address = new Address(request.Address.Street, request.Address.City, request.Address.State, request.Address.ZipCode);
+
+            student.EditPersonalInfo(request.Name, address);
             _studentRepository.Save(student);
 
             return Ok();
@@ -57,7 +68,7 @@ namespace Api
             {
                 Course course = _courseRepository.GetByName(enrollmentDto.Course);
                 var grade = Enum.Parse<Grade>(enrollmentDto.Grade);
-                
+
                 student.Enroll(course, grade);
             }
 
@@ -71,7 +82,13 @@ namespace Api
 
             var resonse = new GetResonse
             {
-                Address = student.Address,
+                Address = new AddressDto()
+                {
+                    Street = student.Address.Street,
+                    City = student.Address.City,
+                    ZipCode = student.Address.ZipCode,
+                    State = student.Address.State
+                },
                 Email = student.Email,
                 Name = student.Name,
                 Enrollments = student.Enrollments.Select(x => new CourseEnrollmentDto
