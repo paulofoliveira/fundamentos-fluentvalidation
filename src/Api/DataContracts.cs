@@ -5,6 +5,7 @@
         public string Name { get; set; }
         public string Email { get; set; }
         public AddressDto[] Addresses { get; set; }
+        //public PhoneNumberDto Phone { get; set; }
     }
     public class RegisterResponse
     {
@@ -38,4 +39,19 @@
         public string State { get; set; }
         public string ZipCode { get; set; }
     }
+
+    //public abstract class PhoneNumberDto
+    //{
+    //    public string Number { get; set; }
+    //}
+
+    //public class UsPhoneNumberDto : PhoneNumberDto
+    //{
+
+    //}
+
+    //public class InternationalPhoneNumberDto : PhoneNumberDto
+    //{
+
+    //}
 }

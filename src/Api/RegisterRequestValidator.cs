@@ -56,6 +56,15 @@ namespace Api
             //});
 
             RuleFor(x => x.Addresses).NotNull().SetValidator(new AddressesCollectionDtoValidator());
+
+            // Aplicando Herança (Inheritance)
+
+            //RuleFor(x => x.Phone)
+            //    .SetInheritanceValidator(x =>
+            //    {
+            //        x.Add(new USPhoneNumberDtoValidator());
+            //        x.Add(new InternationalPhoneNumberDtoValidator());
+            //    });
         }
     }
     public class AddressDtoValidator : AbstractValidator<AddressDto>
@@ -82,4 +91,18 @@ namespace Api
              });
         }
     }
+
+    //public class USPhoneNumberDtoValidator : AbstractValidator<UsPhoneNumberDto>
+    //{
+    //    public USPhoneNumberDtoValidator()
+    //    {
+    //    }
+    //}
+
+    //public class InternationalPhoneNumberDtoValidator : AbstractValidator<InternationalPhoneNumberDto>
+    //{
+    //    public InternationalPhoneNumberDtoValidator()
+    //    {
+    //    }
+    //}
 }
