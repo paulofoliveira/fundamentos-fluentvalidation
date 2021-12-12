@@ -25,13 +25,13 @@ namespace Api
         [HttpPost]
         public IActionResult Register([FromBody] RegisterRequest request)
         {
-            if (!ModelState.IsValid)
-            {
-                var errors = ModelState.Where(x => x.Value.Errors.Any())
-                    .Select(x => x.Value.Errors.First().ErrorMessage).ToArray();
+            //if (!ModelState.IsValid)
+            //{
+            //    var errors = ModelState.Where(x => x.Value.Errors.Any())
+            //        .Select(x => x.Value.Errors.First().ErrorMessage).ToArray();
 
-                return BadRequest(errors);
-            }
+            //    return BadRequest(errors);
+            //}
 
             var addresses = request.Addresses
                 .Select(address => new Address(address.Street, address.City, address.State, address.ZipCode))
@@ -51,12 +51,12 @@ namespace Api
         [HttpPut("{id}")]
         public IActionResult EditPersonalInfo(long id, [FromBody] EditPersonalInfoRequest request)
         {
-            var validator = new EditPersonalInfoRequestValidator();
+            //var validator = new EditPersonalInfoRequestValidator();
 
-            var result = validator.Validate(request);
+            //var result = validator.Validate(request);
 
-            if (!result.IsValid)
-                return BadRequest(result.Errors[0].ErrorMessage);
+            //if (!result.IsValid)
+            //    return BadRequest(result.Errors[0].ErrorMessage);
 
             var student = _studentRepository.GetById(id);
 
