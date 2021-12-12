@@ -7,10 +7,21 @@ namespace Api
         public EditPersonalInfoRequestValidator()
         {
             RuleFor(x => x.Name).NotEmpty().Length(0, 200);
-            RuleFor(x => x.Address).NotNull().SetValidator(new AddressDtoValidator());
+
+            //RuleFor(x => x.Addresses).NotNull().SetValidator(new AddressDtoValidator());
+
+            //RuleFor(x => x.Addresses).NotNull()
+            //    .Must(x => x?.Length >= 1 && x.Length <= 3)
+            //    .WithMessage("The number of address must be between and 3")
+            //    .ForEach(address =>
+            //    {
+            //        address.NotNull();
+            //        address.SetValidator(new AddressDtoValidator());
+            //    });
+
+            RuleFor(x => x.Addresses).NotNull().SetValidator(new AddressesCollectionValidator());
         }
     }
-
     public class RegisterRequestValidator : AbstractValidator<RegisterRequest>
     {
         public RegisterRequestValidator()
@@ -33,10 +44,20 @@ namespace Api
 
             // Para evitar duplicação de código o ideal é criar um Validator separado para AddressDto (Abaixo) tendo um código mais limpo, evitando duplicação e verbosidade.
 
-            RuleFor(x => x.Address).NotNull().SetValidator(new AddressDtoValidator());
+            //RuleFor(x => x.Addresses).NotNull().SetValidator(new AddressDtoValidator());
+
+            //RuleFor(x => x.Addresses).NotNull()
+            //.Must(x => x?.Length >= 1 && x.Length <= 3)
+            //.WithMessage("The number of address must be between and 3")
+            //.ForEach(address =>
+            //{
+            //    address.NotNull();
+            //    address.SetValidator(new AddressDtoValidator());
+            //});
+
+            RuleFor(x => x.Addresses).NotNull().SetValidator(new AddressesCollectionValidator());
         }
     }
-
     public class AddressDtoValidator : AbstractValidator<AddressDto>
     {
         public AddressDtoValidator()
@@ -45,6 +66,20 @@ namespace Api
             RuleFor(x => x.City).NotEmpty().Length(0, 40);
             RuleFor(x => x.State).NotEmpty().Length(0, 2);
             RuleFor(x => x.ZipCode).NotEmpty().Length(0, 5);
+        }
+    }
+    public class AddressesCollectionValidator : AbstractValidator<AddressDto[]>
+    {
+        public AddressesCollectionValidator()
+        {
+            RuleFor(x => x)
+             .Must(x => x?.Length >= 1 && x.Length <= 3)
+             .WithMessage("The number of address must be between and 3")
+             .ForEach(address =>
+             {
+                 address.NotNull();
+                 address.SetValidator(new AddressDtoValidator());
+             });
         }
     }
 }

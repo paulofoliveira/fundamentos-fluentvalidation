@@ -11,37 +11,34 @@ namespace Api
             Alice(),
             Bob()
         };
+
         private static long _lastId = _existingStudents.Max(x => x.Id);
 
         public Student GetById(long id)
         {
-            // Retrieving from the database
-            return _existingStudents.SingleOrDefault(x => x.Id == id);
+            return _existingStudents.SingleOrDefault(x => x.Id == id); // Retrieving from the database
         }
 
         public void Save(Student student)
         {
-            // Setting up the id for new students emulates the ORM behavior
-            if (student.Id == 0)
+            if (student.Id == 0)  // Setting up the id for new students emulates the ORM behavior
             {
                 _lastId++;
                 SetId(student, _lastId);
             }
 
-            // Saving to the database
-            _existingStudents.RemoveAll(x => x.Id == student.Id);
+            _existingStudents.RemoveAll(x => x.Id == student.Id); // Saving to the database
             _existingStudents.Add(student);
         }
 
         private static void SetId(Entity entity, long id)
         {
-            // The use of reflection to set up the Id emulates the ORM behavior
-            entity.GetType().GetProperty(nameof(Entity.Id)).SetValue(entity, id);
+            entity.GetType().GetProperty(nameof(Entity.Id)).SetValue(entity, id); // The use of reflection to set up the Id emulates the ORM behavior
         }
 
         private static Student Alice()
         {
-            var alice = new Student("alice@gmail.com", "Alice Alison", new Address("1234 Main St", "Arlington", "VA", "22201"));
+            var alice = new Student("alice@gmail.com", "Alice Alison", new[] { new Address("1234 Main St", "Arlington", "VA", "22201") });
             SetId(alice, 1);
             alice.Enroll(new Course(1, "Calculus", 5), Grade.A);
 
@@ -50,7 +47,7 @@ namespace Api
 
         private static Student Bob()
         {
-            var bob = new Student("bob@gmail.com", "Bob Bobson", new Address("2345 Second St", "Barlington", "VA", "22202"));
+            var bob = new Student("bob@gmail.com", "Bob Bobson", new[] { new Address("2345 Second St", "Barlington", "VA", "22202") });
             SetId(bob, 2);
             bob.Enroll(new Course(2, "History", 4), Grade.B);
 

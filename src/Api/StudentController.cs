@@ -27,8 +27,11 @@ namespace Api
             if (!result.IsValid)
                 return BadRequest(result.Errors[0].ErrorMessage);
 
-            var address = new Address(request.Address.Street, request.Address.City, request.Address.State, request.Address.ZipCode);
-            var student = new Student(request.Email, request.Name, address);
+            var addresses = request.Addresses
+                .Select(address => new Address(address.Street, address.City, address.State, address.ZipCode))
+                .ToArray();
+
+            var student = new Student(request.Email, request.Name, addresses);
 
             _studentRepository.Save(student);
 
@@ -51,9 +54,11 @@ namespace Api
 
             var student = _studentRepository.GetById(id);
 
-            var address = new Address(request.Address.Street, request.Address.City, request.Address.State, request.Address.ZipCode);
+            var addresses = request.Addresses
+           .Select(address => new Address(address.Street, address.City, address.State, address.ZipCode))
+           .ToArray();
 
-            student.EditPersonalInfo(request.Name, address);
+            student.EditPersonalInfo(request.Name, addresses);
             _studentRepository.Save(student);
 
             return Ok();
@@ -80,15 +85,15 @@ namespace Api
         {
             Student student = _studentRepository.GetById(id);
 
-            var resonse = new GetResonse
+            var response = new GetResonse
             {
-                Address = new AddressDto()
+                Addresses = student.Addresses.Select(address => new AddressDto()
                 {
-                    Street = student.Address.Street,
-                    City = student.Address.City,
-                    ZipCode = student.Address.ZipCode,
-                    State = student.Address.State
-                },
+                    Street = address.Street,
+                    City = address.City,
+                    ZipCode = address.ZipCode,
+                    State = address.State
+                }).ToArray(),
                 Email = student.Email,
                 Name = student.Name,
                 Enrollments = student.Enrollments.Select(x => new CourseEnrollmentDto
@@ -97,7 +102,7 @@ namespace Api
                     Grade = x.Grade.ToString()
                 }).ToArray()
             };
-            return Ok(resonse);
+            return Ok(response);
         }
     }
 }
