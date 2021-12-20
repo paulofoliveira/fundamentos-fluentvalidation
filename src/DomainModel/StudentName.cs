@@ -5,7 +5,7 @@ namespace DomainModel
 {
     public class StudentName : ValueObject
     {
-        public StudentName(string value)
+        private StudentName(string value)
         {
             Value = value;
         }
@@ -14,6 +14,19 @@ namespace DomainModel
         protected override IEnumerable<object> GetEqualityComponents()
         {
             yield return Value;
+        }
+
+        public static Result<StudentName> Create(string input)
+        {
+            if (string.IsNullOrWhiteSpace(input))
+                return Result.Failure<StudentName>("Valor é obrigatório");
+
+            var email = input.Trim();
+
+            if (email.Length > 200)
+                return Result.Failure<StudentName>("Valor informado é muito grande");
+
+            return Result.Success(new StudentName(email));
         }
     }
 }

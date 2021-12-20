@@ -37,10 +37,16 @@ namespace Api
                 .Select(address => new Address(address.Street, address.City, address.State, address.ZipCode))
                 .ToArray();
 
-            var email = new Email(request.Email);
-            var studentName = new StudentName(request.Name);
+            var email = Email.Create(request.Email);
+            var studentName = StudentName.Create(request.Name);
 
-            var student = new Student(email, studentName, addresses);
+            if (email.IsFailure)
+                return BadRequest(email.Error);
+
+            if (studentName.IsFailure)
+                return BadRequest(studentName.Error);
+
+            var student = new Student(email.Value, studentName.Value, addresses);
 
             _studentRepository.Save(student);
 
@@ -67,9 +73,12 @@ namespace Api
            .Select(address => new Address(address.Street, address.City, address.State, address.ZipCode))
            .ToArray();
 
-            var studentName = new StudentName(request.Name);
+            var studentName = StudentName.Create(request.Name);
 
-            student.EditPersonalInfo(studentName, addresses);
+            if (studentName.IsFailure)
+                return BadRequest(studentName.Error);
+
+            student.EditPersonalInfo(studentName.Value, addresses);
             _studentRepository.Save(student);
 
             return Ok();
