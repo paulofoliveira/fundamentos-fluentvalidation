@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using DomainModel;
+using FluentValidation;
 
 namespace Api
 {
@@ -31,11 +32,12 @@ namespace Api
             // NotEmpty Rule considera valor nulo e vazio.
             // Regra aplicada no EmailAdress é a simplificada por padrão (.NET 5) por questão de ser impossível validar o e-mail com todas as possibilidades.
 
-            RuleFor(x => x.Name)
-                //.Cascade(CascadeMode.Stop) // Ativar CascadeMode à nível de propriedade
-                .NotEmpty()
-                .Length(0, 200);
+            //RuleFor(x => x.Name)
+            //.Cascade(CascadeMode.Stop) // Ativar CascadeMode à nível de propriedade
+            //.NotEmpty()
+            //.Length(0, 200);
 
+            RuleFor(x => x.Name).MustBeValueObject(StudentName.Create).When(x => x.Name != null);
 
             // .When(x=> x.Address != null) checa se Address não é nula. Se condição é verdadeira pois no input poderia passar Address como null.
 
@@ -101,7 +103,12 @@ namespace Api
             When(x => x.Phone == null, () => { RuleFor(x => x.Email).NotEmpty(); });
             When(x => x.Email == null, () => { RuleFor(x => x.Phone).NotEmpty(); });
 
-            RuleFor(x => x.Email).NotEmpty().Length(0, 150).EmailAddress().When(x => x.Email != null);
+            //RuleFor(x => x.Email).NotEmpty().Length(0, 150).EmailAddress().When(x => x.Email != null);
+
+            // Validação combinada entre FluentValidation + Value Object com extensão implementada (MustBeValueObject)
+
+            RuleFor(x => x.Email).MustBeValueObject(Email.Create).When(x => x.Email != null);
+
             RuleFor(x => x.Phone).NotEmpty().Matches("^[2-9][0-9]{9}$").When(x => x.Phone != null);
         }
     }
