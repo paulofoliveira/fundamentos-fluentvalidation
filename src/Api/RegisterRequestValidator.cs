@@ -37,7 +37,7 @@ namespace Api
             //.NotEmpty()
             //.Length(0, 200);
 
-            RuleFor(x => x.Name).MustBeValueObject(StudentName.Create).When(x => x.Name != null);
+            RuleFor(x => x.Name).MustBeValueObject(StudentName.Create);
 
             // .When(x=> x.Address != null) checa se Address não é nula. Se condição é verdadeira pois no input poderia passar Address como null.
 
