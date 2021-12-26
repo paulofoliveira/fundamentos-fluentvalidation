@@ -15,11 +15,13 @@ namespace Api
     {
         private readonly StudentRepository _studentRepository;
         private readonly CourseRepository _courseRepository;
+        private readonly StateRepository _stateRepository;
 
-        public StudentController(StudentRepository studentRepository, CourseRepository courseRepository)
+        public StudentController(StudentRepository studentRepository, CourseRepository courseRepository, StateRepository stateRepository)
         {
             _studentRepository = studentRepository;
             _courseRepository = courseRepository;
+            _stateRepository = stateRepository;
         }
 
         [HttpPost]
@@ -34,7 +36,7 @@ namespace Api
             //}
 
             var addresses = request.Addresses
-                .Select(address => Address.Create(address.Street, address.City, address.State, address.ZipCode).Value)
+                .Select(address => Address.Create(address.Street, address.City, address.State, address.ZipCode, _stateRepository.GetAll()).Value)
                 .ToArray();
 
             var email = Email.Create(request.Email);
@@ -73,8 +75,8 @@ namespace Api
             var student = _studentRepository.GetById(id);
 
             var addresses = request.Addresses
-           .Select(address => Address.Create(address.Street, address.City, address.State, address.ZipCode).Value)
-           .ToArray();
+                                   .Select(address => Address.Create(address.Street, address.City, address.State, address.ZipCode, _stateRepository.GetAll()).Value)
+                                   .ToArray();
 
             var studentName = StudentName.Create(request.Name);
 

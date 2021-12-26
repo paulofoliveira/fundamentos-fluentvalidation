@@ -17,9 +17,9 @@ namespace DomainModel
         public State State { get; }
         public string ZipCode { get; }
 
-        public static Result<Address> Create(string street, string city, string state, string zipCode)
+        public static Result<Address> Create(string street, string city, string state, string zipCode, string[] allStates)
         {
-            var stateObject = State.Create(state).Value;
+            var stateObject = State.Create(state, allStates).Value;
 
             street = (street ?? string.Empty).Trim();
             city = (city ?? string.Empty).Trim();
