@@ -1,12 +1,15 @@
-﻿using FluentValidation;
+﻿using DomainModel;
+using FluentValidation;
 
 namespace Api
 {
     public class EditPersonalInfoRequestValidator : AbstractValidator<EditPersonalInfoRequest>
     {
-        public EditPersonalInfoRequestValidator()
+        public EditPersonalInfoRequestValidator(StateRepository stateRepository)
         {
-            RuleFor(x => x.Name).NotEmpty().Length(0, 200);
+            //RuleFor(x => x.Name).NotEmpty().Length(0, 200);
+
+            RuleFor(x => x.Name).MustBeValueObject(StudentName.Create);
 
             //RuleFor(x => x.Addresses).NotNull().SetValidator(new AddressDtoValidator());
 
@@ -19,23 +22,24 @@ namespace Api
             //        address.SetValidator(new AddressDtoValidator());
             //    });
 
-            RuleFor(x => x.Addresses).NotNull().SetValidator(new AddressesCollectionDtoValidator());
+            RuleFor(x => x.Addresses).NotNull().SetValidator(new AddressesCollectionDtoValidator(stateRepository));
         }
     }
     public class RegisterRequestValidator : AbstractValidator<RegisterRequest>
     {
-        public RegisterRequestValidator()
+        public RegisterRequestValidator(StateRepository stateRepository)
         {
             // CascadeMode = CascadeMode.Stop; Ativar CascadeMode à nível de Validator
 
             // NotEmpty Rule considera valor nulo e vazio.
             // Regra aplicada no EmailAdress é a simplificada por padrão (.NET 5) por questão de ser impossível validar o e-mail com todas as possibilidades.
 
-            RuleFor(x => x.Name)
-                //.Cascade(CascadeMode.Stop) // Ativar CascadeMode à nível de propriedade
-                .NotEmpty()
-                .Length(0, 200);
+            //RuleFor(x => x.Name)
+            //.Cascade(CascadeMode.Stop) // Ativar CascadeMode à nível de propriedade
+            //.NotEmpty()
+            //.Length(0, 200);
 
+            RuleFor(x => x.Name).MustBeValueObject(StudentName.Create);
 
             // .When(x=> x.Address != null) checa se Address não é nula. Se condição é verdadeira pois no input poderia passar Address como null.
 
@@ -60,7 +64,7 @@ namespace Api
             //    address.SetValidator(new AddressDtoValidator());
             //});
 
-            RuleFor(x => x.Addresses).NotNull().SetValidator(new AddressesCollectionDtoValidator());
+            RuleFor(x => x.Addresses).NotNull().SetValidator(new AddressesCollectionDtoValidator(stateRepository));
 
             // Aplicando Herança (Inheritance)
 
@@ -101,7 +105,14 @@ namespace Api
             When(x => x.Phone == null, () => { RuleFor(x => x.Email).NotEmpty(); });
             When(x => x.Email == null, () => { RuleFor(x => x.Phone).NotEmpty(); });
 
-            RuleFor(x => x.Email).NotEmpty().Length(0, 150).EmailAddress().When(x => x.Email != null);
+            //RuleFor(x => x.Email).NotEmpty().Length(0, 150).EmailAddress().When(x => x.Email != null);
+
+            // Validação combinada entre FluentValidation + Value Object com extensão implementada (MustBeValueObject)
+
+            RuleFor(x => x.Email)
+               .MustBeValueObject(Email.Create)
+               .When(x => x.Email != null);
+
             RuleFor(x => x.Phone).NotEmpty().Matches("^[2-9][0-9]{9}$").When(x => x.Phone != null);
         }
     }
@@ -117,7 +128,7 @@ namespace Api
     }
     public class AddressesCollectionDtoValidator : AbstractValidator<AddressDto[]>
     {
-        public AddressesCollectionDtoValidator()
+        public AddressesCollectionDtoValidator(StateRepository stateRepository)
         {
             RuleFor(x => x)
              //.Must(x => x?.Length >= 1 && x.Length <= 3)
@@ -126,7 +137,16 @@ namespace Api
              .ForEach(address =>
              {
                  address.NotNull();
-                 address.SetValidator(new AddressDtoValidator());
+                 // address.SetValidator(new AddressDtoValidator());
+                 // Vai utilizar o MustBeEntity (abaixo) para utilizar a validação do domínio
+
+                 address.ChildRules(x =>
+                 {
+                     x.CascadeMode = CascadeMode.Stop;
+                     x.RuleFor(x => x.State).MustBeValueObject(state => State.Create(state, stateRepository.GetAll()));
+                     x.RuleFor(x => x).MustBeEntity(x => Address.Create(x.Street, x.City, x.State, x.ZipCode, stateRepository.GetAll()));
+                 });
+
              });
         }
     }

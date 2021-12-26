@@ -15,11 +15,13 @@ namespace Api
     {
         private readonly StudentRepository _studentRepository;
         private readonly CourseRepository _courseRepository;
+        private readonly StateRepository _stateRepository;
 
-        public StudentController(StudentRepository studentRepository, CourseRepository courseRepository)
+        public StudentController(StudentRepository studentRepository, CourseRepository courseRepository, StateRepository stateRepository)
         {
             _studentRepository = studentRepository;
             _courseRepository = courseRepository;
+            _stateRepository = stateRepository;
         }
 
         [HttpPost]
@@ -34,10 +36,22 @@ namespace Api
             //}
 
             var addresses = request.Addresses
-                .Select(address => new Address(address.Street, address.City, address.State, address.ZipCode))
+                .Select(address => Address.Create(address.Street, address.City, address.State, address.ZipCode, _stateRepository.GetAll()).Value)
                 .ToArray();
 
-            var student = new Student(request.Email, request.Name, addresses);
+            var email = Email.Create(request.Email);
+            var studentName = StudentName.Create(request.Name);
+
+            //if (email.IsFailure)
+            //    return BadRequest(email.Error);
+
+            //if (studentName.IsFailure)
+            //    return BadRequest(studentName.Error);
+
+            // Não há mais necessidade de validar diretamente, pois o FluentValidation já aplica a validação com a criação de um Value Object correspondente
+            // conforme configuração com MustBeValueObject.
+
+            var student = new Student(email.Value, studentName.Value, addresses); ;
 
             _studentRepository.Save(student);
 
@@ -61,10 +75,15 @@ namespace Api
             var student = _studentRepository.GetById(id);
 
             var addresses = request.Addresses
-           .Select(address => new Address(address.Street, address.City, address.State, address.ZipCode))
-           .ToArray();
+                                   .Select(address => Address.Create(address.Street, address.City, address.State, address.ZipCode, _stateRepository.GetAll()).Value)
+                                   .ToArray();
 
-            student.EditPersonalInfo(request.Name, addresses);
+            var studentName = StudentName.Create(request.Name);
+
+            if (studentName.IsFailure)
+                return BadRequest(studentName.Error);
+
+            student.EditPersonalInfo(studentName.Value, addresses);
             _studentRepository.Save(student);
 
             return Ok();
@@ -98,10 +117,10 @@ namespace Api
                     Street = address.Street,
                     City = address.City,
                     ZipCode = address.ZipCode,
-                    State = address.State
+                    State = address.State.Value
                 }).ToArray(),
-                Email = student.Email,
-                Name = student.Name,
+                Email = student.Email.Value,
+                Name = student.Name.Value,
                 Enrollments = student.Enrollments.Select(x => new CourseEnrollmentDto
                 {
                     Course = x.Course.Name,
