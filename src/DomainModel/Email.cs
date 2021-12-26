@@ -17,20 +17,20 @@ namespace DomainModel
             yield return Value;
         }
 
-        public static Result<Email> Create(string input)
+        public static Result<Email, Error> Create(string input)
         {
             if (string.IsNullOrWhiteSpace(input))
-                return Result.Failure<Email>("Valor é obrigatório");
+                return Errors.General.ValueIsRequired();
 
-            var email = input.Trim();
+            string email = input.Trim();
 
             if (email.Length > 150)
-                return Result.Failure<Email>("Valor informado é muito grande");
+                return Errors.General.InvalidLength();
 
-            if (!Regex.IsMatch(email, @"^(.+)@(.+)$"))
-                return Result.Failure<Email>("Email é inválido");
+            if (Regex.IsMatch(email, @"^(.+)@(.+)$") == false)
+                return Errors.General.ValueIsInvalid();
 
-            return Result.Success(new Email(email));
+            return new Email(email);
         }
     }
 }

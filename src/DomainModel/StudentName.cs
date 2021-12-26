@@ -16,17 +16,17 @@ namespace DomainModel
             yield return Value;
         }
 
-        public static Result<StudentName> Create(string input)
+        public static Result<StudentName, Error> Create(string input)
         {
             if (string.IsNullOrWhiteSpace(input))
-                return Result.Failure<StudentName>("Valor é obrigatório");
+                return Errors.General.ValueIsRequired();
 
             var email = input.Trim();
 
             if (email.Length > 200)
-                return Result.Failure<StudentName>("Valor informado é muito grande");
+                return Errors.General.InvalidLength("Email");
 
-            return Result.Success(new StudentName(email));
+            return new StudentName(email);
         }
     }
 }

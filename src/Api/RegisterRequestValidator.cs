@@ -7,7 +7,9 @@ namespace Api
     {
         public EditPersonalInfoRequestValidator()
         {
-            RuleFor(x => x.Name).NotEmpty().Length(0, 200);
+            //RuleFor(x => x.Name).NotEmpty().Length(0, 200);
+
+            RuleFor(x => x.Name).MustBeValueObject(StudentName.Create);
 
             //RuleFor(x => x.Addresses).NotNull().SetValidator(new AddressDtoValidator());
 
@@ -107,7 +109,9 @@ namespace Api
 
             // Validação combinada entre FluentValidation + Value Object com extensão implementada (MustBeValueObject)
 
-            RuleFor(x => x.Email).MustBeValueObject(Email.Create).When(x => x.Email != null);
+            RuleFor(x => x.Email)
+               .MustBeValueObject(Email.Create)
+               .When(x => x.Email != null);
 
             RuleFor(x => x.Phone).NotEmpty().Matches("^[2-9][0-9]{9}$").When(x => x.Phone != null);
         }

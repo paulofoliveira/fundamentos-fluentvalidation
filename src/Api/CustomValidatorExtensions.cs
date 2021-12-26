@@ -1,4 +1,5 @@
 ﻿using CSharpFunctionalExtensions;
+using DomainModel;
 using FluentValidation;
 using System;
 using System.Collections.Generic;
@@ -8,18 +9,17 @@ namespace Api
     public static class CustomValidatorExtensions
     {
         public static IRuleBuilderOptions<T, string> MustBeValueObject<T, TValueObject>(
-            this IRuleBuilder<T, string> ruleBuilder, Func<string, Result<TValueObject>> factoryMethod)
-            where TValueObject : ValueObject
+                   this IRuleBuilder<T, string> ruleBuilder,
+                   Func<string, Result<TValueObject, Error>> factoryMethod)
+                   where TValueObject : ValueObject
         {
             return (IRuleBuilderOptions<T, string>)ruleBuilder.Custom((value, context) =>
             {
-                if (string.IsNullOrWhiteSpace(value)) return;
-
-                var result = factoryMethod(value);
+                Result<TValueObject, Error> result = factoryMethod(value);
 
                 if (result.IsFailure)
                 {
-                    context.AddFailure(result.Error);
+                    context.AddFailure(result.Error.Message);
                 }
             });
         }

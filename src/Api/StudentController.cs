@@ -40,13 +40,16 @@ namespace Api
             var email = Email.Create(request.Email);
             var studentName = StudentName.Create(request.Name);
 
-            if (email.IsFailure)
-                return BadRequest(email.Error);
+            //if (email.IsFailure)
+            //    return BadRequest(email.Error);
 
-            if (studentName.IsFailure)
-                return BadRequest(studentName.Error);
+            //if (studentName.IsFailure)
+            //    return BadRequest(studentName.Error);
 
-            var student = new Student(email.Value, studentName.Value, addresses);
+            // Não há mais necessidade de validar diretamente, pois o FluentValidation já aplica a validação com a criação de um Value Object correspondente
+            // conforme configuração com MustBeValueObject.
+
+            var student = new Student(email.Value, studentName.Value, addresses); ;
 
             _studentRepository.Save(student);
 
