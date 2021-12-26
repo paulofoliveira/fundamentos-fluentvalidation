@@ -137,7 +137,10 @@ namespace Api
              .ForEach(address =>
              {
                  address.NotNull();
-                 address.SetValidator(new AddressDtoValidator());
+                 // address.SetValidator(new AddressDtoValidator());
+                 // Vai utilizar o MustBeEntity (abaixo) para utilizar a validação do domínio
+
+                 address.MustBeEntity(x => Address.Create(x.Street, x.City, x.State, x.ZipCode));
              });
         }
     }

@@ -34,7 +34,7 @@ namespace Api
             //}
 
             var addresses = request.Addresses
-                .Select(address => new Address(address.Street, address.City, address.State, address.ZipCode))
+                .Select(address => Address.Create(address.Street, address.City, address.State, address.ZipCode).Value)
                 .ToArray();
 
             var email = Email.Create(request.Email);
@@ -73,7 +73,7 @@ namespace Api
             var student = _studentRepository.GetById(id);
 
             var addresses = request.Addresses
-           .Select(address => new Address(address.Street, address.City, address.State, address.ZipCode))
+           .Select(address => Address.Create(address.Street, address.City, address.State, address.ZipCode).Value)
            .ToArray();
 
             var studentName = StudentName.Create(request.Name);

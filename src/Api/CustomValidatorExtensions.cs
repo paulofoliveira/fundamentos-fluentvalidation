@@ -8,6 +8,21 @@ namespace Api
 {
     public static class CustomValidatorExtensions
     {
+        public static IRuleBuilderOptions<T, TElement> MustBeEntity<T, TElement, TValueObject>(this IRuleBuilder<T, TElement> ruleBuilder,
+            Func<TElement, Result<TValueObject>> factoryMethod)
+            where TValueObject : DomainModel.Entity
+        {
+            return (IRuleBuilderOptions<T, TElement>)ruleBuilder.Custom((value, context) =>
+            {
+                Result<TValueObject> result = factoryMethod(value);
+
+                if (result.IsFailure)
+                {
+                    context.AddFailure(result.Error);
+                }
+            });
+        }
+
         public static IRuleBuilderOptions<T, string> MustBeValueObject<T, TValueObject>(
                    this IRuleBuilder<T, string> ruleBuilder,
                    Func<string, Result<TValueObject, Error>> factoryMethod)
