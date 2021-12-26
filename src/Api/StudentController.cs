@@ -115,7 +115,7 @@ namespace Api
                     Street = address.Street,
                     City = address.City,
                     ZipCode = address.ZipCode,
-                    State = address.State
+                    State = address.State.Value
                 }).ToArray(),
                 Email = student.Email.Value,
                 Name = student.Name.Value,

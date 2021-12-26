@@ -140,7 +140,13 @@ namespace Api
                  // address.SetValidator(new AddressDtoValidator());
                  // Vai utilizar o MustBeEntity (abaixo) para utilizar a validação do domínio
 
-                 address.MustBeEntity(x => Address.Create(x.Street, x.City, x.State, x.ZipCode));
+                 address.ChildRules(x =>
+                 {
+                     x.CascadeMode = CascadeMode.Stop;
+                     x.RuleFor(x => x.State).MustBeValueObject(State.Create);
+                     x.RuleFor(x => x).MustBeEntity(x => Address.Create(x.Street, x.City, x.State, x.ZipCode));
+                 });
+
              });
         }
     }
